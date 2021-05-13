@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Kaxiluo\ApiSignature;
 
 use Kaxiluo\ApiSignature\Exception\InvalidSignatureException;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Psr\Http\Message\RequestInterface;
 use Psr\SimpleCache\CacheInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 
-abstract class SignatureVerifyMiddleware implements MiddlewareInterface
+abstract class SignatureVerifyMiddleware
 {
     protected $headerName = 'X-Signature';
 
@@ -19,27 +18,39 @@ abstract class SignatureVerifyMiddleware implements MiddlewareInterface
 
     protected $nonceCacheKeyPrefix = 'api:nonce:';
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    public function __invoke($request, $handler)
     {
+        $adaptRequest = $this->adaptRequest($request);
+
         try {
             (new SignatureValidator(
                 $this->getCacheProvider(),
-                [$this, 'getAppSecretByAppId'],
+                function ($appId) {
+                    return $this->getAppSecretByAppId($appId);
+                },
                 $this->headerName,
                 $this->lifetime,
                 $this->nonceCacheKeyPrefix
-            ))->verify($request);
+            ))->verify($adaptRequest);
         } catch (InvalidSignatureException $exception) {
-            $res = $this->handleInvalidSignature($exception);
-            if ($res instanceof ResponseInterface) {
-                return $res;
-            }
+            return $this->handleInvalidSignature($exception);
         }
 
-        return $handler->handle($request);
+        return $handler($request);
     }
 
-    abstract protected function handleInvalidSignature(InvalidSignatureException $exception): ResponseInterface;
+    private function adaptRequest($request)
+    {
+        if (!($request instanceof RequestInterface)) {
+            $psr17Factory = new Psr17Factory();
+            $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
+            $request = $psrHttpFactory->createRequest($request);
+        }
+
+        return $request;
+    }
+
+    abstract protected function handleInvalidSignature(InvalidSignatureException $exception);
 
     abstract protected function getCacheProvider(): CacheInterface;
 
