@@ -6,20 +6,12 @@ namespace Kaxiluo\ApiSignature\Server;
 
 use Kaxiluo\ApiSignature\Exception\InvalidSignatureException;
 use Nyholm\Psr7\Factory\Psr17Factory;
-use Psr\Container\ContainerInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 abstract class SignatureVerifyLaravelMiddleware extends SignatureVerifyMiddleware
 {
-    private $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
     protected function adaptRequest($request)
     {
         if ($request instanceof Request) {
@@ -39,10 +31,5 @@ abstract class SignatureVerifyLaravelMiddleware extends SignatureVerifyMiddlewar
     protected function handleInvalidSignature(InvalidSignatureException $exception)
     {
         return new JsonResponse(['error' => $exception->getMessage()], 401);
-    }
-
-    protected function getCacheProvider()
-    {
-        return $this->container->get('cache.store');
     }
 }
