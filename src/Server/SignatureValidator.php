@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Kaxiluo\ApiSignature;
+namespace Kaxiluo\ApiSignature\Server;
 
 use Kaxiluo\ApiSignature\Constant\ValidationField;
 use Kaxiluo\ApiSignature\Exception\InvalidSignatureException;
+use Kaxiluo\ApiSignature\SignatureHelper;
+use Kaxiluo\ApiSignature\SignatureUtil;
 use Psr\Http\Message\RequestInterface;
 use Psr\SimpleCache\CacheInterface;
 

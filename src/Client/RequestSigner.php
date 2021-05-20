@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Kaxiluo\ApiSignature;
+namespace Kaxiluo\ApiSignature\Client;
 
 use Kaxiluo\ApiSignature\Constant\ValidationField;
+use Kaxiluo\ApiSignature\SignatureHelper;
+use Kaxiluo\ApiSignature\SignatureUtil;
 use Psr\Http\Message\RequestInterface;
 
 class RequestSigner

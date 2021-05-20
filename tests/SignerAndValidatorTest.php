@@ -6,8 +6,8 @@ namespace Tests;
 
 use Kaxiluo\ApiSignature\Constant\ValidationField;
 use Kaxiluo\ApiSignature\Exception\InvalidSignatureException;
-use Kaxiluo\ApiSignature\RequestSigner;
-use Kaxiluo\ApiSignature\SignatureValidator;
+use Kaxiluo\ApiSignature\Client\RequestSigner;
+use Kaxiluo\ApiSignature\Server\SignatureValidator;
 use Tests\Mock\Cache;
 
 class SignerAndValidatorTest extends TestCase

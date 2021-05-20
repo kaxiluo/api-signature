@@ -2,13 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kaxiluo\ApiSignature;
+namespace Kaxiluo\ApiSignature\Server;
 
 use Kaxiluo\ApiSignature\Exception\InvalidSignatureException;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Psr\Http\Message\RequestInterface;
-use Psr\SimpleCache\CacheInterface;
-use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 
 abstract class SignatureVerifyMiddleware
 {
@@ -36,23 +32,19 @@ abstract class SignatureVerifyMiddleware
             return $this->handleInvalidSignature($exception);
         }
 
-        return $handler($request);
+        return $this->handleNext($request, $handler);
     }
 
-    private function adaptRequest($request)
-    {
-        if (!($request instanceof RequestInterface)) {
-            $psr17Factory = new Psr17Factory();
-            $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
-            $request = $psrHttpFactory->createRequest($request);
-        }
+    abstract protected function handleNext($request, $handler);
 
+    protected function adaptRequest($request)
+    {
         return $request;
     }
 
     abstract protected function handleInvalidSignature(InvalidSignatureException $exception);
 
-    abstract protected function getCacheProvider(): CacheInterface;
+    abstract protected function getCacheProvider();
 
     abstract protected function getAppSecretByAppId($appId): string;
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kaxiluo\ApiSignature;
+namespace Kaxiluo\ApiSignature\Client;
 
 use Psr\Http\Message\RequestInterface;
 
