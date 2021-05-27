@@ -15,8 +15,9 @@ class SignatureHelper
         $beSigned['timestamp'] = $timestamp;
         $beSigned['nonce'] = $nonce;
         $beSigned['path'] = static::getPath($request);
-        $beSigned['method'] = $request->getMethod();
-        ksort($beSigned);
+        $beSigned['method'] = strtoupper($request->getMethod());
+        $beSigned['payload'] = $request->getUri()->getQuery() . $request->getBody()->getContents();
+        $request->getBody()->rewind();
         return http_build_query($beSigned);
     }
 

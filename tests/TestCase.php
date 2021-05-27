@@ -6,6 +6,7 @@ namespace Tests;
 
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use Tests\Mock\Cache;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -19,8 +20,20 @@ abstract class TestCase extends BaseTestCase
         return \Mockery::mock($class);
     }
 
-    public function createRequest(array $json = [], array $headers = []): Request
+    public function createRequest(
+        array $json = [],
+        array $headers = [],
+        $method = 'GET',
+        $uri = 'http://mock.mock/test'
+    ): Request
     {
-        return new Request('GET', 'http://mock.mock/test', $headers, json_encode($json));
+        return new Request($method, $uri, $headers, json_encode($json));
+    }
+
+    public function getMockCache()
+    {
+        $cache = $this->getMockery(Cache::class);
+        $cache->shouldReceive('set')->andReturn(false);
+        return $cache;
     }
 }
