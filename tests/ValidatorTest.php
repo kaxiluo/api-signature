@@ -22,6 +22,7 @@ class ValidatorTest extends TestCase
         // create signed request
         $requestSigner = new RequestSigner('1', 'iamaappsecret');
         $signedRequest = $requestSigner->sign($this->createRequest());
+        $signedRequest->getBody()->rewind();
 
         // verify success
         $cache->shouldReceive('has')->once()->andReturn(false);
@@ -53,6 +54,7 @@ class ValidatorTest extends TestCase
             'POST',
             'https://mock.mock/test?a=b&c= api &c'
         ));
+        $signedRequest->getBody()->rewind();
 
         // verify success
         $cache->shouldReceive('has')->once()->andReturn(false);
